@@ -12,7 +12,7 @@ COMMAND_PDF_COMPILE = (
 
 COMMAND_PNG_CONVERT = 'convert -density {0}  -colorspace RGB -alpha opaque -background white  -quality {1} "{2}" "{3}"'
 
-COMMAND_CLEANUP3 = 'latexmk -c -cd -f "{0}"'
+COMMAND_CLEANUP3 = 'latexmk -C -cd -f "{0}"'
 
 psr = argparse.ArgumentParser()
 
@@ -58,6 +58,8 @@ for p in in_dir.glob(r'**/*.pdf'):
         shutil.copy(p, pdf_out_dir/p.name) # copy all PDFs over.
     print(f'Copying: {p.name}')
 
-
+z = in_dir.glob(r'**/*.tex')
 for p in z:
-    os.system(COMMAND_CLEANUP3.format(str(p)))
+    os.system(COMMAND_CLEANUP3.format(str(p.resolve())))
+    print(f'Cleaning {p}')
+# os.system(COMMAND_CLEANUP3.format(str(in_dir.resolve())))
