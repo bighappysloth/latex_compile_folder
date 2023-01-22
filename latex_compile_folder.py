@@ -50,13 +50,20 @@ for p in z:
                 str(pdf_path),
                 str(image_path))
             )
-    
+temp = []
 for p in in_dir.glob(r'**/*.pdf'):
     if p.name == 'main.pdf':
         shutil.copy(p, pdf_out_dir/(str(in_dir.name)+ '_MAIN.pdf'))
     else:
-        shutil.copy(p, pdf_out_dir/p.name) # copy all PDFs over.
+        if p.name in temp:
+            duplicates = len(list(filter(lambda a: a==p.name, temp)))
+            duplicates = duplicates + 1
+            shutil.copy(p, pdf_out_dir/(p.stem + ' - (1).pdf'))
+        else:
+            shutil.copy(p, pdf_out_dir/p.name) # copy all PDFs over.
+            temp.append(p.name)
     print(f'Copying: {p.name}')
+        
 
 z = in_dir.glob(r'**/*.tex')
 for p in z:
