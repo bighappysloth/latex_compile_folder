@@ -21,6 +21,8 @@ psr.add_argument(dest='out', type=Path, help = 'the path to dump output')
 
 psr.add_argument('-png', '-p', action='store_true', dest='png', help = 'whether to also compile images or not')
 
+psr.add_argument('-single','-s', action='store_true', dest='mainonly', help='whether to compile only main.tex')
+
 args = psr.parse_args()
 
 in_dir = args.src
@@ -30,11 +32,12 @@ png_out_dir = out/'png'
 
 
 # check output directory exists
+if not out.exists(): out.mkdir()
 if not pdf_out_dir.exists(): pdf_out_dir.mkdir()
 if not png_out_dir.exists(): png_out_dir.mkdir()
 
 # list of tex
-z = in_dir.glob(r'**/*.tex')
+z = in_dir.glob(r'**/*.tex') if not args.mainonly else [in_dir/Path(r'main.tex')]
 
 
 for p in z:
@@ -53,8 +56,8 @@ for p in z:
 temp = []
 for p in in_dir.glob(r'**/*.pdf'):
     if p.name == 'main.pdf':
-        shutil.copy(p, pdf_out_dir/(str(in_dir.name)+ '_MAIN.pdf'))
-    else:
+        shutil.copy(p, pdf_out_dir/(str(in_dir.resolve().name)+ '_MAIN.pdf'))
+    elif not args.mainonly:
         if p.name in temp:
             duplicates = len(list(filter(lambda a: a==p.name, temp)))
             duplicates = duplicates + 1
@@ -65,7 +68,7 @@ for p in in_dir.glob(r'**/*.pdf'):
     print(f'Copying: {p.name}')
         
 
-z = in_dir.glob(r'**/*.tex')
+z = in_dir.glob(r'**/*.tex') if not args.mainonly else [in_dir/Path(r'main.tex')]
 for p in z:
     os.system(COMMAND_CLEANUP3.format(str(p.resolve())))
     print(f'Cleaning {p}')
